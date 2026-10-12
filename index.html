@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+
+  <body class="m-30">
+    <button class="bg-blue-400 p-4 rounded-2xl" onclick="AddNewTasks()">
+      Add Task
+    </button>
+    <div id="tasks"></div>
+
+    <script>
+      const tasksFromLocalStorage = localStorage.getItem("tasks");
+      const tasksArray = tasksFromLocalStorage
+        ? JSON.parse(tasksFromLocalStorage)
+        : [
+            { name: "shalaa ugaa", status: "active" },
+            { name: "hogoo shuurd", status: "completed" },
+            { name: "aygaa ugaa", status: "completed" },
+          ];
+      const AddNewTasks = () => {
+        const input = prompt("Enter task name");
+        const NewTask = { name: input, status: "active" };
+        tasksArray.unshift(NewTask);
+        render();
+      };
+      function saveTask(index) {
+        const input = document.querySelector(`#edit-input-${index} input`);
+        tasksArray[index].name = input.value;
+        render();
+      }
+      function cancelEdit(index) {
+        document
+          .getElementById(`task-name-${index}`)
+          .classList.remove("hidden");
+        document.getElementById(`edit-input-${index}`).classList.add("hidden");
+      }
+      const editTask = (index) => {
+        document.getElementById(`task-name-${index}`).classList.add("hidden");
+        document
+          .getElementById(`edit-input-${index}`)
+          .classList.remove("hidden");
+      };
+
+      const tasksContainer = document.getElementById("tasks");
+
+      const render = () => {
+        localStorage.setItem("tasks", JSON.stringify(tasksArray));
+        const tasksHTML = tasksArray
+          .map(
+            (task, index) =>
+              `<div class="w-90 border mb-4 rounded-2xl mx-auto p-4 flex gap-3">
+            <input type="checkbox" ${task.status === "completed" ? "checked" : ""}>
+
+
+             <div class="flex gap-3" id="task-name-${index}">
+              <div >${task.name}</div>
+                
+                <button onclick="editTask(${index})">✏️</button>
+            <button onclick="tasksArray.splice(${index}, 1); render();">🗑️</button>
+            </div>
+
+            
+           <div id="edit-input-${index}" class="hidden flex gap-6">
+             <input type="text"  class="border" />  
+              
+                <button onclick="saveTask(${index})">✔️</button>
+            <button onclick="cancelEdit(${index})">✖️</button>
+              </div>
+
+          
+            
+            
+          </div>`,
+          )
+          .join("");
+
+        tasksContainer.innerHTML = tasksHTML;
+      };
+      render();
+    </script>
+  </body>
+</html>
